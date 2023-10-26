@@ -1,6 +1,7 @@
 <%@page import="com.example.webapphr1_2023.Beans.Employee" %>
+<%@page import="java.util.ArrayList" %>
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
-<jsp:useBean id="listaEmpleados" type="java.util.ArrayList<com.example.webapphr1_2023.Beans.Employee>" scope="request"/>
+<jsp:useBean id="listaEmpleados" type="ArrayList<Employee>" scope="request"/>
 <!DOCTYPE html>
 <html>
     <head>
@@ -27,8 +28,8 @@
                         <th>Job</th>
                         <th>Salary</th>
                         <th>Commision</th>
-                        <th>Manager ID</th>
-                        <th>Department ID</th>
+                        <th>Manager</th>
+                        <th>Department</th>
                         <th></th>
                         <th></th>
                     </tr>
@@ -45,15 +46,15 @@
                         </td>
                         <td><%= e.getEmail()%>
                         </td>
-                        <td><%= e.getJobId()%>
+                        <td><%= e.getJob().getJobTitle()%>
                         </td>
                         <td><%= e.getSalary()%>
                         </td>
                         <td><%= e.getCommissionPct() == null ? "Sin comisión" : e.getCommissionPct()%>
                         </td>
-                        <td><%= e.getManagerId() == 0 ? "Sin jefe" : e.getManagerId() %>
+                        <td><%= e.getManager() == null ? "-- Sin jefe --" : e.getManager().getFullName() %>
                         </td>
-                        <td><%= e.getDepartmentId() == 0 ? "Sin depa" : e.getDepartmentId()%>
+                        <td><%= e.getDepartment().getDepartmentId() == 0 ? "-- Sin depa --" : e.getDepartment().getDepartmentName()%>
                         </td>
                         <td>
                             <a class="btn btn-primary"

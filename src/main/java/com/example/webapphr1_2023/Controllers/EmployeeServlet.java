@@ -1,6 +1,8 @@
 package com.example.webapphr1_2023.Controllers;
 
+import com.example.webapphr1_2023.Beans.Department;
 import com.example.webapphr1_2023.Beans.Employee;
+import com.example.webapphr1_2023.Beans.Job;
 import com.example.webapphr1_2023.Daos.DepartmentDao;
 import com.example.webapphr1_2023.Daos.EmployeeDao;
 import com.example.webapphr1_2023.Daos.JobDao;
@@ -33,6 +35,9 @@ public class EmployeeServlet extends HttpServlet {
                 view.forward(request, response);
                 break;
             case "agregar":
+                request.setAttribute("listaTrabajos",jobDao.obtenerListaTrabajos());
+                request.setAttribute("listaJefes",employeeDao.listarEmpleados());
+                request.setAttribute("listaDepartamentos",departmentDao.lista());
                 view = request.getRequestDispatcher("employees/formularioNuevo.jsp");
                 view.forward(request, response);
                 break;
@@ -44,12 +49,16 @@ public class EmployeeServlet extends HttpServlet {
                         employeeId = Integer.parseInt(employeeIdString);
                     } catch (NumberFormatException ex) {
                         response.sendRedirect("EmployeeServlet");
+
                     }
 
                     Employee emp = employeeDao.obtenerEmpleado(employeeId);
 
                     if (emp != null) {
                         request.setAttribute("empleado", emp);
+                        request.setAttribute("listaTrabajos",jobDao.obtenerListaTrabajos());
+                        request.setAttribute("listaJefes",employeeDao.listarEmpleados());
+                        request.setAttribute("listaDepartamentos",departmentDao.lista());
                         view = request.getRequestDispatcher("employees/formularioEditar.jsp");
                         view.forward(request, response);
                     } else {
@@ -88,7 +97,28 @@ public class EmployeeServlet extends HttpServlet {
         String action = request.getParameter("action") == null ? "lista" : request.getParameter("action");
 
         EmployeeDao employeeDao = new EmployeeDao();
-        Employee employee = setEmployeeData(request);
+
+        Employee employee = new Employee();
+        employee.setFirstName(request.getParameter("first_name"));
+        employee.setLastName(request.getParameter("last_name"));
+        employee.setEmail(request.getParameter("email"));
+        employee.setPhoneNumber(request.getParameter("phone"));
+        employee.setHireDate(request.getParameter("hire_date"));
+
+        Job job = new Job();
+        job.setJobId(request.getParameter("job_id"));
+        employee.setJob(job);
+
+        employee.setSalary(new BigDecimal(request.getParameter("salary")));
+        employee.setCommissionPct(request.getParameter("commission").equals("") ? null : new BigDecimal(request.getParameter("commission")));
+
+        Employee manager = new Employee();
+        manager.setEmployeeId(Integer.parseInt(request.getParameter("manager_id")));
+        employee.setManager(manager);
+
+        Department department = new Department();
+        department.setDepartmentId(Integer.parseInt(request.getParameter("department_id")));
+        employee.setDepartment(department);
 
         switch (action) {
             case "guardar":
@@ -105,23 +135,6 @@ public class EmployeeServlet extends HttpServlet {
 
                 break;
         }
-    }
-
-    private Employee setEmployeeData(HttpServletRequest request) {
-        Employee employee = new Employee();
-        employee.setFirstName(request.getParameter("first_name"));
-        employee.setLastName(request.getParameter("last_name"));
-        employee.setEmail(request.getParameter("email"));
-        employee.setPhoneNumber(request.getParameter("phone"));
-        employee.setHireDate(request.getParameter("hire_date"));
-        employee.setJobId(request.getParameter("job_id"));
-        employee.setSalary(new BigDecimal(request.getParameter("salary")));
-        employee.setCommissionPct(request.getParameter("commission").equals("") ? null : new BigDecimal(request.getParameter("commission")));
-        employee.setManagerId(Integer.parseInt(request.getParameter("manager_id")));
-        employee.setDepartmentId(Integer.parseInt(request.getParameter("department_id")));
-
-        return employee;
-
     }
 
 }
